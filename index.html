@@ -1,0 +1,965 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Сапёр</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Сапёр">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0e7c6b">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAC7klEQVR4Xu3dMW7VQBiFUQdRU7MmyiyChoo+JT19FkGZNbEMFFlCIDzv+dpjE89/Tg9Pia6+GQU0efjw9GWCJe98W2gxDoyDnHKgHOSUA+UgpxwoBznlQDnIKQfKQU45UA5yyoFykFMOlIOccqAc5JQD5SD3Pv8jy34+fe/1V/3r47ev0zT9+PT5uI94fHk+5yNO+Eb14ljBsUJOOVAOcsqBcpBTDpSDnHKgHOSUA+UgpxwoBznlQDnIKQfKQU45UA5yyoFykFMOlIOccqAc5JQD5SCnHCgHuQe/OpQWxwpN3R5vOeFllROePTnhqzjhI3pRDhwr5AYsx/yAGPsNOI5pet2Hiew35jhm9rHTyOOQkJ0GH8fvhKjIBiXGYSLbFBqHi0iq3DhcRNarOA6nzEp1x2Eid1Ufh4vIDcZBk3H85fHlef7FK0yTcSwxkZlyNEmIcdxSPCHGcV/ZiRjHWgVPGeMIVEuIccTqTMQ4NqowEePYZeyLiHHsNXBCjKOPISdiHD0NNhHj6G+Yi4hxHGKMhBjHga4+EY+30KQcNF3p8ZaVz5688fvgCU/Q9KIcOFb+t5XZe1O6HSu0XHEWM+M40HVnYRwHuvosZi6k/Y2xDMdKZ8PMwrHS02CzMI4+hpyFO0cHAy/DnWO7sWfhWNmowiyMI1ZnFu4cmWrLcOdYpeAsHCv3lZ2FY+WO4stwrCwzC8fKArP4k3+Vpck4XgnGour/E8wsbqg7DrO4q+I4zGKlcncOy1ivUDnMIlViHGaxzeDjMIs9Rr5zWMZOY5bDLLrweAt+fE6u27FyaMnn91hOePbkhK/ihI/oZeQLKTsZB+4c5JQD5SCnHCgHOeVAOcgpB8pBTjlQDnLKgXKQUw6Ug5xyoBzklAPlIKccKAc55UA5yCkHykFOOVAOcspBk8dbcKyQc6ygHOSUA+UgpxwoBznlQDnIKQfKQU45UA5yyoFykFMOlIOccqAc5JQD5SCnHCgHOeVAOcj9ArF5mkcX5vmvAAAAAElFTkSuQmCC">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=JetBrains+Mono:wght@700&display=swap">
+<style>
+/* Layout: one narrow column of views, board in a scrollable frame, fixed bottom tab bar for thumb reach. */
+:root {
+  --bg: #edf0f3;
+  --panel: #ffffff;
+  --ink: #1b2631;
+  --muted: #5a6978;
+  --line: #d2d9e0;
+  --cell: #bcc6d1;
+  --cell-hi: #dbe2e9;
+  --cell-lo: #8896a5;
+  --open: #f6f8fa;
+  --accent: #0e7c6b;
+  --accent-ink: #ffffff;
+  --danger: #c2303b;
+  --good: #1f9d55;
+  --flag: #d1303c;
+  --led-bg: #151b21;
+  --led-ink: #ff6a5c;
+  --n1: #1b64d6; --n2: #23812f; --n3: #cc2f3a; --n4: #2d3a9e;
+  --n5: #8a4b2a; --n6: #0a7f8c; --n7: #1b2631; --n8: #6b7886;
+  --font-body: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-num: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11161b; --panel: #1a2128; --ink: #e5eaef; --muted: #93a1af; --line: #2b353f;
+    --cell: #3d4957; --cell-hi: #566475; --cell-lo: #232b34; --open: #151b21;
+    --accent: #3cc2ad; --accent-ink: #0b1613; --danger: #ff7a84; --good: #4fd48a; --flag: #ff6b76;
+    --led-bg: #0b0f13; --led-ink: #ff7a6b;
+    --n1: #6aaeff; --n2: #6fd07f; --n3: #ff7a84; --n4: #9aa6ff;
+    --n5: #d9a07c; --n6: #4fd3df; --n7: #e5eaef; --n8: #a5b1bd;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11161b; --panel: #1a2128; --ink: #e5eaef; --muted: #93a1af; --line: #2b353f;
+  --cell: #3d4957; --cell-hi: #566475; --cell-lo: #232b34; --open: #151b21;
+  --accent: #3cc2ad; --accent-ink: #0b1613; --danger: #ff7a84; --good: #4fd48a; --flag: #ff6b76;
+  --led-bg: #0b0f13; --led-ink: #ff7a6b;
+  --n1: #6aaeff; --n2: #6fd07f; --n3: #ff7a84; --n4: #9aa6ff;
+  --n5: #d9a07c; --n6: #4fd3df; --n7: #e5eaef; --n8: #a5b1bd;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); -webkit-text-size-adjust: 100%; }
+.app {
+  max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px;
+  padding-block: 14px 28px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+h1 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.01em; }
+h2 { margin: 0; font-size: 18px; font-weight: 800; }
+.sub { font-size: 13px; color: var(--muted); font-weight: 700; text-align: right; }
+.view { display: flex; flex-direction: column; gap: 14px; }
+button { font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.ghost { background: none; border: 1px solid var(--line); border-radius: 10px; padding: 9px 14px; font-weight: 700; font-size: 14px; }
+.primary { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 10px; padding: 12px 20px; font-weight: 800; }
+.seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 3px; gap: 3px; }
+.seg button { border: 0; background: none; padding: 11px 6px; border-radius: 9px; font-weight: 700; font-size: 14px; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.hud { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.led { background: var(--led-bg); color: var(--led-ink); font-family: var(--font-num); font-size: 28px; line-height: 1; padding: 8px 12px; border-radius: 10px; letter-spacing: 0.08em; min-width: 84px; text-align: center; font-variant-numeric: tabular-nums; }
+#face { width: 52px; height: 52px; font-size: 28px; line-height: 1; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; }
+#modeLabel { margin: 0; font-size: 14px; font-weight: 700; color: var(--muted); }
+#msg { margin: 0; min-height: 20px; font-size: 14px; font-weight: 700; color: var(--accent); }
+.boardwrap { position: relative; overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 8px; max-width: 100%; -webkit-overflow-scrolling: touch; }
+#board { display: grid; width: max-content; margin: 0 auto; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: manipulation; }
+.c { width: var(--s); height: var(--s); display: flex; align-items: center; justify-content: center; font-family: var(--font-num); font-weight: 700; font-size: calc(var(--s) * 0.56); line-height: 1; color: var(--ink); position: relative; }
+.c svg { width: 62%; height: 62%; }
+.c.h { background: var(--cell); box-shadow: inset 2px 2px 0 var(--cell-hi), inset -2px -2px 0 var(--cell-lo); }
+.c.o { background: var(--open); box-shadow: inset 0 0 0 0.5px var(--line); }
+.c.boom { background: var(--danger); }
+.c.boom svg { color: #fff; }
+.c.wrong::after { content: ""; position: absolute; inset: 18%; background: linear-gradient(to top right, transparent 45%, var(--danger) 45% 55%, transparent 55%), linear-gradient(to top left, transparent 45%, var(--danger) 45% 55%, transparent 55%); }
+.c.hm { box-shadow: inset 0 0 0 3px var(--danger); background: color-mix(in srgb, var(--danger) 35%, var(--cell)); }
+.c.hs { box-shadow: inset 0 0 0 3px var(--good); background: color-mix(in srgb, var(--good) 40%, var(--cell)); }
+.c.xr::after { content: ""; position: absolute; width: 22%; height: 22%; border-radius: 50%; background: var(--danger); opacity: .8; }
+.n1 { color: var(--n1); } .n2 { color: var(--n2); } .n3 { color: var(--n3); } .n4 { color: var(--n4); }
+.n5 { color: var(--n5); } .n6 { color: var(--n6); } .n7 { color: var(--n7); } .n8 { color: var(--n8); }
+#pause { position: absolute; inset: 0; background: var(--panel); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; z-index: 2; font-weight: 800; font-size: 20px; }
+.toolbar { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: stretch; }
+.toolbar .seg button { padding: 14px 6px; font-size: 15px; }
+.toolbar .ghost { font-size: 15px; }
+.hint { margin: 0; font-size: 13px; line-height: 1.5; color: var(--muted); max-width: 65ch; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.card h3 { margin: 0; font-size: 16px; }
+.card p { margin: 0; font-size: 14px; line-height: 1.5; color: var(--muted); }
+.card .meta { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 13px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
+.card.locked { opacity: .55; }
+.card.next { border-color: var(--accent); }
+.tag { font-family: var(--font-num); font-size: 12px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 2px 8px; }
+.sec-title { margin: 8px 0 0; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 800; }
+.sg { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 4px 14px; display: flex; flex-direction: column; }
+.sg > * { border-top: 1px solid var(--line); }
+.sg > *:first-child { border-top: 0; }
+.srow { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 0; }
+.srow > span { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.srow b { font-size: 15px; }
+.srow small { font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+.srow select { font: inherit; font-size: 15px; background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px; }
+.srow input[type="range"] { width: 130px; accent-color: var(--accent); }
+.sw { appearance: none; -webkit-appearance: none; flex: none; width: 50px; height: 30px; border-radius: 15px; background: var(--cell-lo); position: relative; transition: background .15s; margin: 0; cursor: pointer; }
+.sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: transform .15s; }
+.sw:checked { background: var(--accent); }
+.sw:checked::after { transform: translateX(20px); }
+.sgrp { padding: 12px 0; display: flex; flex-direction: column; gap: 8px; }
+.sgrp > b { font-size: 15px; }
+.cust { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 4px 0 12px; }
+.cust label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 700; min-width: 0; }
+.cust input { width: 100%; font: inherit; font-size: 16px; padding: 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font-variant-numeric: tabular-nums; }
+.cust .err { grid-column: 1 / -1; margin: 0; font-size: 13px; color: var(--danger); }
+.cust .btns { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; }
+.warn { background: color-mix(in srgb, var(--danger) 12%, var(--panel)); border: 1px solid color-mix(in srgb, var(--danger) 45%, var(--line)); border-radius: 12px; padding: 12px 14px; font-size: 13.5px; line-height: 1.5; }
+.lvl { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; font-size: 14px; }
+.lvl h3 { grid-column: 1 / -1; margin: 0 0 4px; font-size: 15px; }
+.lvl span:nth-child(odd) { color: var(--muted); }
+.lvl span:nth-child(even) { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+.times { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; grid-column: 1 / -1; }
+.times b { font-family: var(--font-num); font-size: 13px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 3px 8px; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; }
+#tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; background: var(--panel); border-top: 1px solid var(--line); display: flex; justify-content: center; padding: 6px max(8px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); }
+#tabs .in { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; width: 100%; max-width: 560px; }
+#tabs button { border: 0; background: none; border-radius: 10px; padding: 10px 2px; font-size: 12.5px; font-weight: 800; color: var(--muted); }
+#tabs button[aria-current="page"] { background: color-mix(in srgb, var(--accent) 16%, var(--panel)); color: var(--accent); }
+[hidden] { display: none !important; }
+.scrim { position: fixed; inset: 0; background: rgba(8, 12, 16, 0.55); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 30; }
+.modal { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 22px; width: min(380px, 100%); max-height: 90%; overflow: auto; display: flex; flex-direction: column; gap: 10px; text-align: center; }
+.modal .big { font-size: 44px; line-height: 1; }
+.modal h2 { font-size: 22px; }
+.modal p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.5; font-variant-numeric: tabular-nums; }
+.modal .row { justify-content: center; margin-top: 8px; }
+.modal .row button { flex: 1 1 140px; }
+.modal button.sec { background: none; border: 1px solid var(--line); border-radius: 10px; padding: 11px 18px; font-weight: 700; }
+#v-menu h1 { text-align: center; }
+.sq { position: relative; display: grid; place-items: center; width: min(78vw, 340px); aspect-ratio: 1; margin: 6px auto 0; background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 14px; }
+.pvbox { width: 100%; height: 100%; display: grid; place-items: center; min-width: 0; min-height: 0; }
+.pv { display: grid; gap: 1px; max-width: 100%; max-height: 100%; }
+.pv i { background: var(--cell); box-shadow: inset 1px 1px 0 var(--cell-hi), inset -1px -1px 0 var(--cell-lo); min-width: 0; min-height: 0; }
+.pv i.po { background: var(--open); box-shadow: none; }
+.play { position: absolute; width: 68px; height: 68px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; box-shadow: 0 6px 18px rgba(0, 0, 0, .28); }
+.play svg { width: 34px; height: 34px; }
+.cap { text-align: center; display: flex; flex-direction: column; gap: 2px; }
+.cap b { font-size: 22px; font-weight: 800; }
+.cap span { font-size: 14px; color: var(--muted); font-weight: 700; }
+#contBtn { align-self: center; }
+.block { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.bh { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.bh span { font-size: 13px; color: var(--muted); font-weight: 700; }
+.mlist { display: flex; flex-direction: column; gap: 6px; }
+.mrow { display: flex; align-items: center; gap: 12px; text-align: left; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+.mrow.sel { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, var(--panel)); }
+.mn { flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--panel); border: 1px solid var(--line); display: grid; place-items: center; font-family: var(--font-num); font-size: 13px; }
+.mt { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.mt small { font-size: 12.5px; color: var(--muted); }
+.ms { font-size: 12.5px; color: var(--muted); font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+.tile { display: flex; align-items: center; justify-content: space-between; gap: 12px; text-align: left; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px 14px; }
+.tile > span:first-child { display: flex; flex-direction: column; gap: 2px; }
+.tile b { font-size: 17px; }
+.tile small { font-size: 13px; color: var(--muted); }
+.chev { font-size: 26px; color: var(--muted); }
+.row3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.top { display: flex; align-items: center; gap: 12px; }
+.top .sub { margin-left: auto; }
+.bigsel { font: inherit; font-size: 16px; background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 10px; width: 100%; }
+@media (max-width: 420px) { .led { font-size: 24px; min-width: 74px; } }
+@media (prefers-reduced-motion: no-preference) { .modal { animation: pop .18s ease-out; } @keyframes pop { from { transform: scale(.96); opacity: 0; } to { transform: none; opacity: 1; } } }
+</style>
+</head>
+<body>
+
+<main class="app">
+  <!-- МЕНЮ -->
+  <section class="view" id="v-menu">
+    <h1>Сапёр</h1>
+    <button class="sq" id="sq" type="button" aria-label="Играть">
+      <span class="pvbox"><span class="pv" id="sqPv"></span></span>
+      <span class="play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></span>
+    </button>
+    <div class="cap"><b id="sqName"></b><span id="sqInfo"></span></div>
+    <button class="ghost" id="contBtn" type="button" hidden>Продолжить партию</button>
+    <button class="tile" id="campTile" type="button"><span><b>Кампания</b><small id="campInfo"></small></span><span class="chev" aria-hidden="true">›</span></button>
+    <button class="tile" id="setTile" type="button"><span><b>Настройки</b><small>Режим поля, управление, подсказки, читы</small></span><span class="chev" aria-hidden="true">›</span></button>
+    <div class="row3">
+      <button class="ghost" type="button" data-go="story">Сюжет</button>
+      <button class="ghost" type="button" data-go="scn">Сценарии</button>
+      <button class="ghost" type="button" data-go="stats">Статистика</button>
+    </div>
+  </section>
+
+  <!-- ИГРА -->
+  <section class="view" id="v-game" hidden>
+    <div class="top"><button class="ghost" type="button" data-back>← Меню</button><div class="sub" id="sub"></div></div>
+    <p id="modeLabel"></p>
+    <div class="hud">
+      <div class="led" id="minesLed" role="img" aria-label="Осталось мин">010</div>
+      <button id="face" type="button" aria-label="Новая игра">🙂</button>
+      <div class="led" id="timeLed" role="img" aria-label="Время игры">000</div>
+    </div>
+    <p id="msg" role="status" aria-live="polite"></p>
+    <div class="boardwrap" id="wrap">
+      <div id="board" role="grid" aria-label="Игровое поле"></div>
+      <div id="pause" hidden><span>Пауза</span><button class="primary" type="button" id="resumeBtn">Продолжить</button></div>
+    </div>
+    <div class="toolbar">
+      <div class="seg" id="modeSeg" role="group" aria-label="Режим касания">
+        <button type="button" data-m="open" aria-pressed="true">Открыть</button>
+        <button type="button" data-m="flag" aria-pressed="false">Флажок</button>
+      </div>
+      <button class="ghost" id="bulbBtn" type="button" aria-label="Подсказка">💡 3</button>
+      <button class="ghost" id="pauseBtn" type="button">Пауза</button>
+    </div>
+    <p class="hint">Касание делает то, что выбрано в режиме, долгое касание делает обратное. Касание открытой цифры открывает соседей, если вокруг стоит столько же флажков. Лампочка показывает красным ближайшую мину и зелёным соседнюю безопасную клетку. Всё остальное в «Настройках».</p>
+  </section>
+
+  <!-- СЮЖЕТ -->
+  <section class="view" id="v-story" hidden>
+    <div class="top"><button class="ghost" type="button" data-back>← Меню</button><h2>Сюжет</h2></div>
+    <p class="hint">Двенадцать заданий: от учебного макета 2×2 до поля 16×16. Следующее задание открывается после победы в предыдущем.</p>
+    <div class="view" id="storyList"></div>
+  </section>
+
+  <!-- СЦЕНАРИИ -->
+  <section class="view" id="v-scn" hidden>
+    <div class="top"><button class="ghost" type="button" data-back>← Меню</button><h2>Сценарии</h2></div>
+    <p class="hint">Отдельные задачи с особыми условиями. Результаты не попадают в статистику.</p>
+    <div class="view" id="scnList"></div>
+  </section>
+
+  <!-- СТАТИСТИКА -->
+  <section class="view" id="v-stats" hidden>
+    <div class="top"><button class="ghost" type="button" data-back>← Меню</button><h2>Статистика</h2></div>
+    <div class="view" id="statsBody"></div>
+    <div class="row"><button class="ghost" type="button" id="resetStats">Сбросить статистику</button></div>
+  </section>
+
+  <!-- НАСТРОЙКИ -->
+  <section class="view" id="v-set" hidden>
+    <div class="top"><button class="ghost" type="button" data-back>← Меню</button><h2>Настройки</h2></div>
+
+    <p class="sec-title">Поле</p>
+    <div class="sg">
+      <div class="sgrp"><b>Режим поля</b>
+        <select id="fieldSel" data-k="fieldMode" class="bigsel" aria-label="Режим поля"></select>
+        <small class="hint" id="fieldInfo"></small>
+      </div>
+      <div id="customBox">
+        <div class="cust">
+          <label>Строк<input id="cRows" type="number" inputmode="numeric" min="2" max="30"></label>
+          <label>Столбцов<input id="cCols" type="number" inputmode="numeric" min="2" max="50"></label>
+          <label>Мин<input id="cMines" type="number" inputmode="numeric" min="1"></label>
+          <p class="err" id="cErr" hidden></p>
+          <div class="btns">
+            <button class="primary" type="button" id="cApply">Применить и играть</button>
+            <button class="ghost" type="button" id="cRandom">Случайное поле</button>
+          </div>
+        </div>
+      </div>
+      <label class="srow"><span><b>Края соединены</b><small>Поле свёрнуто в тор: клетки у левого края соседствуют с клетками у правого, верх с низом. Работает в режиме «Особый».</small></span><input class="sw" type="checkbox" data-k="wrap"></label>
+    </div>
+
+    <p class="sec-title">Управление</p>
+    <div class="sg">
+      <div class="sgrp"><b>Режим касания при старте</b>
+        <div class="seg" data-k="startMode" role="group" aria-label="Режим касания при старте">
+          <button type="button" data-v="open">Открывать</button>
+          <button type="button" data-v="flag">Ставить флажок</button>
+        </div>
+      </div>
+      <label class="srow"><span><b>Долгое касание</b><small>Выполняет действие, обратное выбранному режиму.</small></span><input class="sw" type="checkbox" data-k="longPress"></label>
+      <label class="srow"><span><b>Длительность долгого касания</b><small id="longVal"></small></span><input type="range" min="200" max="800" step="20" data-k="longMs"></label>
+      <label class="srow"><span><b>Открытие по цифре</b><small>Касание открытой цифры открывает соседей, если флажков вокруг столько же.</small></span><input class="sw" type="checkbox" data-k="chording"></label>
+      <label class="srow"><span><b>Вопросительные знаки</b><small>Третье состояние метки: флажок, потом «?».</small></span><input class="sw" type="checkbox" data-k="qmarks"></label>
+      <label class="srow"><span><b>Флажков не больше, чем мин</b></span><input class="sw" type="checkbox" data-k="limitFlags"></label>
+    </div>
+
+    <p class="sec-title">Внешний вид</p>
+    <div class="sg">
+      <div class="sgrp"><b>Тема</b>
+        <div class="seg" data-k="theme" role="group" aria-label="Тема">
+          <button type="button" data-v="system">Системная</button>
+          <button type="button" data-v="light">Светлая</button>
+          <button type="button" data-v="dark">Тёмная</button>
+        </div>
+      </div>
+      <div class="sgrp"><b>Размер клеток</b>
+        <div class="seg" data-k="cellSize" role="group" aria-label="Размер клеток">
+          <button type="button" data-v="small">Мелкие</button>
+          <button type="button" data-v="auto">Авто</button>
+          <button type="button" data-v="large">Крупные</button>
+        </div>
+      </div>
+    </div>
+
+    <p class="sec-title">Подсказки</p>
+    <div class="sg">
+      <label class="srow"><span><b>Подсказок за игру</b><small>Лампочка показывает ближайшую к последнему касанию мину красным и рядом безопасную клетку зелёным.</small></span>
+        <select data-k="hints" data-num="1"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="5">5</option><option value="10">10</option></select></label>
+      <label class="srow"><span><b>Штраф за подсказку</b><small>Прибавляется к времени игры.</small></span>
+        <select data-k="hintPenalty" data-num="1"><option value="0">Нет</option><option value="5">5 с</option><option value="10">10 с</option><option value="30">30 с</option></select></label>
+    </div>
+
+    <p class="sec-title">Читы</p>
+    <div class="warn">Партии, в которых был использован чит, не попадают в статистику.</div>
+    <div class="sg">
+      <label class="srow"><span><b>Бесконечные подсказки</b><small>Лампочка не расходуется.</small></span><input class="sw" type="checkbox" data-k="cheats.infHints"></label>
+      <label class="srow"><span><b>Отмена хода при поражении</b><small>После взрыва можно вернуть позицию на ход назад.</small></span><input class="sw" type="checkbox" data-k="cheats.undo"></label>
+      <label class="srow"><span><b>Остановить таймер</b><small>Время игры не идёт.</small></span><input class="sw" type="checkbox" data-k="cheats.freeze"></label>
+      <label class="srow"><span><b>Повтор поля после поражения</b><small>Новая партия на том же поле: те же мины на тех же местах.</small></span><input class="sw" type="checkbox" data-k="cheats.replay"></label>
+      <label class="srow"><span><b>Рентген</b><small>Закрытые клетки с минами отмечены красной точкой.</small></span><input class="sw" type="checkbox" data-k="cheats.xray"></label>
+    </div>
+    <div class="row"><button class="ghost" type="button" id="resetSettings">Сбросить настройки</button></div>
+  </section>
+</main>
+
+<div class="scrim" id="scrim" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <div class="big" id="mIcon"></div>
+    <h2 id="mTitle"></h2>
+    <p id="mText"></p>
+    <div class="row" id="mBtns"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var FLAG = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 3v14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6.6 3.4 15.5 7 6.6 10.6z" fill="var(--flag)"/></svg>';
+  var MINE = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="4.6" fill="currentColor"/><path d="M10 2.5v15M2.5 10h15M4.7 4.7l10.6 10.6M15.3 4.7 4.7 15.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="8.6" cy="8.6" r="1.2" fill="var(--open)"/></svg>';
+
+  var MODES = [
+    { id: "beginner", name: "Новичок", rows: 8, cols: 8, mines: 10 },
+    { id: "intermediate", name: "Любитель", rows: 16, cols: 16, mines: 40 },
+    { id: "expert", name: "Профессионал", rows: 16, cols: 30, mines: 99 }
+  ];
+  var LV = {};
+  MODES.forEach(function (m) { LV[m.id] = m; });
+
+  var STORY = [
+    { n: "Первая проверка", r: 2, c: 2, m: 1, t: "Командир кладёт перед вами учебный макет: четыре клетки и одна мина. Не торопитесь.", w: "Макет разобран. Командир молча кивает." },
+    { n: "Огород у сарая", r: 3, c: 3, m: 1, t: "На старом огороде фермер оставил одну забытую мину. Найдите безопасные грядки.", w: "Грядки чисты. Фермер пообещал банку варенья." },
+    { n: "Школьный двор", r: 4, c: 4, m: 3, t: "После учений на школьном дворе не нашли три учебных заряда.", w: "Двор расчищен, завтра здесь снова будут играть дети." },
+    { n: "Тропа к реке", r: 5, c: 5, m: 4, t: "Рыбаки жалуются на странные хлопки у реки. Пройдите тропу.", w: "Тропа открыта, рыбаки вернулись к реке." },
+    { n: "Мостик", r: 6, c: 6, m: 6, t: "Единственный мост в деревню закрыт. Проверьте подходы с обеих сторон.", w: "Мост снова работает, по нему уже едет первая телега." },
+    { n: "Заброшенный рынок", r: 7, c: 7, m: 8, t: "Рынок стоял пустым десять лет. Говорят, между рядами что-то осталось.", w: "Рынок открыт. Торговцы возвращаются." },
+    { n: "Склад", r: 8, c: 8, m: 10, t: "На складе тесно, ошибка стоит дорого. Работайте методично.", w: "Склад проверен. Командир ставит вам первую отметку." },
+    { n: "Пшеничное поле", r: 9, c: 9, m: 12, t: "Скоро жатва. Поле нужно расчистить до прихода комбайнов.", w: "Комбайны вышли в поле вовремя." },
+    { n: "Железная дорога", r: 10, c: 10, m: 15, t: "Расписание срывается: полотно заминировано. Вся смена ждёт вашего сигнала.", w: "Первый поезд прошёл без задержек." },
+    { n: "Лесная просека", r: 12, c: 12, m: 25, t: "Просека длинная и заросшая. Здесь легко потерять счёт.", w: "Просека свободна. Лесники благодарят всю роту." },
+    { n: "Старый аэродром", r: 14, c: 14, m: 35, t: "Огромная площадка и много мин. Командир отправляет только лучших.", w: "Аэродром принимает самолёты. Вы в списке лучших." },
+    { n: "Последнее поле", r: 16, c: 16, m: 50, t: "Финальное задание. Вся рота смотрит на вас.", w: "Поле чисто. Рота встречает вас строем. Сюжет пройден." }
+  ];
+
+  var SCN = [
+    { id: "half", n: "Половина пути", r: 16, c: 16, m: 40, o: { preopen: 0.5 }, d: "Коллега расчистил половину поля 16×16 и ушёл. Закончите работу за него." },
+    { id: "last", n: "Последний рубеж", r: 12, c: 12, m: 30, o: { leftSafe: 5 }, d: "Открыто почти всё, осталось пять безопасных клеток среди 30 мин. Найдите их." },
+    { id: "dense", n: "Плотный огонь", r: 9, c: 9, m: 22, o: {}, d: "Поле 9×9 и 22 мины. Информации мало, ошибаться нельзя." },
+    { id: "race", n: "Гонка со временем", r: 9, c: 9, m: 10, o: { limit: 60 }, d: "Классический «Новичок», но на всё про всё 60 секунд." },
+    { id: "noflag", n: "Без флажков", r: 12, c: 12, m: 20, o: { noFlags: true }, d: "Флажки отключены. Держите мины в голове." },
+    { id: "torus", n: "Замкнутый мир", r: 8, c: 8, m: 10, o: { wrap: true }, d: "Края поля соединены: у клетки на краю соседи есть и с противоположной стороны." }
+  ];
+
+  /* ---------- settings ---------- */
+  var SKEY = "sapper_settings_v2";
+  function defaults() {
+    return {
+      fieldMode: "beginner", custom: { rows: 12, cols: 12, mines: 25 }, wrap: false,
+      startMode: "open", longPress: true, longMs: 380, chording: true, qmarks: false, limitFlags: false,
+      theme: "system", cellSize: "auto", hints: 3, hintPenalty: 0,
+      cheats: { infHints: false, undo: false, freeze: false, replay: false, xray: false }
+    };
+  }
+  var S = defaults();
+  try {
+    var raw = localStorage.getItem(SKEY);
+    if (raw) { var p = JSON.parse(raw), d = defaults(); S = Object.assign(d, p); S.cheats = Object.assign(d.cheats, p.cheats || {}); S.custom = Object.assign(d.custom, p.custom || {}); }
+  } catch (e) {}
+  function saveS() { try { localStorage.setItem(SKEY, JSON.stringify(S)); } catch (e) {} }
+  function getK(k) { var a = k.split("."); return a.length === 1 ? S[a[0]] : S[a[0]][a[1]]; }
+  function setK(k, v) { var a = k.split("."); if (a.length === 1) S[a[0]] = v; else S[a[0]][a[1]] = v; saveS(); }
+
+  /* ---------- stats and story progress ---------- */
+  var KEY = "sapper_stats_v1", SK = "sapper_story_v1", CK = "sapper_camp_v1";
+  function emptyStats() { var b = {}; Object.keys(LV).forEach(function (k) { b[k] = { played: 0, won: 0, streak: 0, bestStreak: 0, times: [] }; }); return b; }
+  function loadStats() {
+    var base = emptyStats();
+    try { var raw = localStorage.getItem(KEY); if (raw) { var s = JSON.parse(raw); Object.keys(base).forEach(function (k) { if (s[k]) base[k] = s[k]; }); } } catch (e) {}
+    return base;
+  }
+  function saveStats(s) { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} }
+  function loadStory() { var d = { done: 0, best: {} }; try { var r = localStorage.getItem(SK); if (r) d = Object.assign(d, JSON.parse(r)); } catch (e) {} return d; }
+  function saveStory(s) { try { localStorage.setItem(SK, JSON.stringify(s)); } catch (e) {} }
+  function loadCamp() { var d = { beaten: {} }; try { var r = localStorage.getItem(CK); if (r) d = Object.assign(d, JSON.parse(r)); } catch (e) {} return d; }
+  function saveCamp(c) { try { localStorage.setItem(CK, JSON.stringify(c)); } catch (e) {} }
+  function modeIndex(id) { for (var i = 0; i < MODES.length; i++) if (MODES[i].id === id) return i; return -1; }
+
+  /* ---------- state ---------- */
+  var cur = null, g = null, els = [], timer = null, mode = S.startMode, lastLayout = null, hintTimer = null, msgTimer = null;
+
+  function pad(n, w) { var s = String(Math.abs(n)); while (s.length < w) s = "0" + s; return s; }
+  function say(text, ms) {
+    $("msg").textContent = text || "";
+    clearTimeout(msgTimer);
+    if (text) msgTimer = setTimeout(function () { $("msg").textContent = ""; }, ms || 4500);
+  }
+  function markCheat() { if (g && !g.cheated) { g.cheated = true; say("Использован чит: результат не попадёт в статистику.", 3500); } }
+
+  /* ---------- game logic ---------- */
+  function nb(i) {
+    var r = (i / g.cols) | 0, c = i % g.cols, out = [], seen = {};
+    for (var dr = -1; dr <= 1; dr++) for (var dc = -1; dc <= 1; dc++) {
+      if (!dr && !dc) continue;
+      var rr = r + dr, cc = c + dc;
+      if (g.wrap) { rr = (rr + g.rows) % g.rows; cc = (cc + g.cols) % g.cols; }
+      else if (rr < 0 || rr >= g.rows || cc < 0 || cc >= g.cols) continue;
+      var j = rr * g.cols + cc;
+      if (j === i || seen[j]) continue;
+      seen[j] = 1; out.push(j);
+    }
+    return out;
+  }
+  function computeAdj() {
+    for (var x = 0; x < g.n; x++) { var cnt = 0; nb(x).forEach(function (y) { cnt += g.mine[y]; }); g.adj[x] = cnt; }
+    g.placed = true;
+  }
+  function shuffle(a) { for (var k = a.length - 1; k > 0; k--) { var j = (Math.random() * (k + 1)) | 0, t = a[k]; a[k] = a[j]; a[j] = t; } return a; }
+  function placeMines(safe) {
+    var excl = {}; excl[safe] = 1;
+    var around = nb(safe);
+    if (g.n - 1 - around.length >= g.mines) around.forEach(function (x) { excl[x] = 1; });
+    var pool = [];
+    for (var i = 0; i < g.n; i++) if (!excl[i]) pool.push(i);
+    shuffle(pool);
+    for (var m = 0; m < g.mines; m++) g.mine[pool[m]] = 1;
+    computeAdj();
+  }
+  function flood(start) {
+    var stack = [start];
+    while (stack.length) {
+      var j = stack.pop();
+      if (g.st[j] === 1 || g.st[j] === 2 || g.mine[j]) continue;
+      g.st[j] = 1; g.opened++; paint(j);
+      if (g.adj[j] === 0) nb(j).forEach(function (n) { if (g.st[n] === 0 || g.st[n] === 3) stack.push(n); });
+    }
+  }
+  function over() { return g.status === "won" || g.status === "lost"; }
+  function begin() { if (g.status === "idle") { g.status = "playing"; startTimer(); } }
+  function snapshot() { g.snap = { st: g.st.slice(), flags: g.flags, opened: g.opened }; }
+  function clearHint() {
+    if (!g.hint) return;
+    var h = g.hint; g.hint = null; clearTimeout(hintTimer); paint(h.mine); paint(h.safe);
+  }
+  function reveal(i) {
+    if (over() || g.paused || g.st[i] === 1 || g.st[i] === 2) return;
+    clearHint(); g.last = i; snapshot();
+    if (!g.placed) placeMines(i);
+    begin();
+    if (g.mine[i]) { lose(i); return; }
+    flood(i); hud(); checkWin();
+  }
+  function chord(i) {
+    if (over() || g.paused || g.st[i] !== 1 || g.adj[i] === 0 || !S.chording) return;
+    var ns = nb(i), fl = 0;
+    ns.forEach(function (n) { if (g.st[n] === 2) fl++; });
+    if (fl !== g.adj[i]) return;
+    clearHint(); g.last = i; snapshot();
+    var boom = -1;
+    ns.forEach(function (n) {
+      if (g.st[n] !== 0 && g.st[n] !== 3) return;
+      if (g.mine[n]) { if (boom < 0) boom = n; } else flood(n);
+    });
+    if (boom >= 0) { lose(boom); return; }
+    hud(); checkWin();
+  }
+  function toggleFlag(i) {
+    if (over() || g.paused || g.st[i] === 1) return;
+    if (cur.o.noFlags) { say("В этом сценарии флажки отключены."); return; }
+    clearHint(); g.last = i;
+    if (g.st[i] === 0) {
+      if (S.limitFlags && g.flags >= g.mines) { say("Флажков не больше, чем мин."); return; }
+      g.st[i] = 2; g.flags++;
+    } else if (g.st[i] === 2) { g.flags--; g.st[i] = S.qmarks ? 3 : 0; }
+    else g.st[i] = 0;
+    paint(i); hud();
+  }
+  function checkWin() { if (g.opened === g.n - g.mines) win(); }
+
+  function lose(i, reason) {
+    g.status = "lost"; g.boom = reason === "time" ? -1 : i; g.reason = reason || "mine";
+    stopTimer(); lastLayout = g.placed ? g.mine.slice() : null; clearHint();
+    paintAll(); face(); hud();
+    var counted = recordResult(false);
+    setTimeout(function () {
+      var btns = [];
+      if (S.cheats.undo && g.snap && g.reason !== "time") btns.push(["Отменить ход", true, undoLoss]);
+      if (S.cheats.replay && lastLayout) btns.push(["Повторить это поле", !btns.length, function () { restart(true); }]);
+      else btns.push(["Играть снова", !btns.length, function () { restart(false); }]);
+      if (cur.kind === "camp") btns.push(["Выйти", false, function () { showView("menu"); }]); else btns.push(["Закрыть", false, null]);
+      modal("😵", g.reason === "time" ? "Время вышло" : "Проигрыш", "Время: " + g.t + " с" + (counted ? "" : ""), btns);
+    }, 450);
+  }
+  function undoLoss() {
+    if (!g.snap) return;
+    markCheat();
+    g.st = g.snap.st.slice(); g.flags = g.snap.flags; g.opened = g.snap.opened;
+    g.status = "playing"; g.boom = -1; g.reason = ""; g.snap = null;
+    paintAll(); face(); hud(); startTimer();
+    removeLastRecord();
+  }
+  function win() {
+    g.status = "won"; stopTimer(); clearHint();
+    for (var i = 0; i < g.n; i++) if (g.mine[i]) g.st[i] = 2;
+    g.flags = g.mines; paintAll(); face(); hud();
+    lastLayout = g.mine.slice();
+    var rec = recordResult(true), text = "Время: " + g.t + " с";
+    var btns = [["Играть снова", false, function () { restart(false); }], ["Закрыть", false, null]];
+    var title = "Победа!";
+    if (cur.kind === "level" && cur.diff !== "custom" && !g.cheated) {
+      var best = loadStats()[cur.diff].times[0];
+      text += ". Лучшее время: " + best + " с" + (rec ? ". Новый рекорд!" : "");
+    }
+    if (cur.kind === "camp") {
+      var cp = loadCamp(), ci = cur.idx; cp.beaten[MODES[ci].id] = true; saveCamp(cp);
+      text = MODES[ci].name + ". " + text;
+      if (ci + 1 < MODES.length) btns = [["Продолжить", true, function () { startCamp(ci + 1); }], ["Выйти", false, function () { showView("menu"); }]];
+      else { title = "Кампания пройдена!"; btns = [["Выйти", true, function () { showView("menu"); }]]; }
+    }
+    if (cur.kind === "story") {
+      var st = loadStory(), idx = cur.idx;
+      if (idx + 1 > st.done) st.done = idx + 1;
+      if (!g.cheated && (st.best[idx] == null || g.t < st.best[idx])) st.best[idx] = g.t;
+      saveStory(st);
+      text = STORY[idx].w + " " + text;
+      if (idx + 1 < STORY.length) btns = [["Следующее задание", true, function () { startStory(idx + 1); }], ["Заново", false, function () { restart(false); }]];
+      else { title = "Сюжет пройден"; btns = [["К списку заданий", true, function () { showView("story"); }]]; }
+    }
+    setTimeout(function () { modal("😎", title, text, btns); }, 350);
+  }
+
+  /* statistics: only classic levels, no cheats */
+  var lastRec = null;
+  function recordResult(won) {
+    lastRec = null;
+    if (cur.kind !== "level" || cur.diff === "custom" || g.cheated) return false;
+    var s = loadStats(), d = s[cur.diff], rec = false;
+    lastRec = JSON.parse(JSON.stringify(d));
+    d.played++;
+    if (won) {
+      d.won++; d.streak++; d.bestStreak = Math.max(d.bestStreak, d.streak);
+      rec = d.times.length === 0 || g.t < d.times[0];
+      d.times.push(g.t); d.times.sort(function (a, b) { return a - b; }); d.times = d.times.slice(0, 5);
+    } else d.streak = 0;
+    saveStats(s);
+    return rec;
+  }
+  function removeLastRecord() {
+    if (!lastRec || cur.kind !== "level") return;
+    var s = loadStats(); s[cur.diff] = lastRec; saveStats(s); lastRec = null;
+  }
+
+  /* ---------- hints ---------- */
+  function hintsLabel() { return "💡 " + (S.cheats.infHints ? "∞" : g.hintsLeft); }
+  function useHint() {
+    if (over() || g.paused) return;
+    if (!g.placed) { say("Сначала сделайте первый ход: до него мин на поле ещё нет."); return; }
+    if (!S.cheats.infHints && g.hintsLeft <= 0) { say("Подсказки закончились."); return; }
+    var ref = g.last != null ? g.last : ((g.rows >> 1) * g.cols + (g.cols >> 1));
+    var rr = (ref / g.cols) | 0, rc = ref % g.cols;
+    function dist(a, b) {
+      var ar = (a / g.cols) | 0, ac = a % g.cols, br = (b / g.cols) | 0, bc = b % g.cols, dr = Math.abs(ar - br), dc = Math.abs(ac - bc);
+      if (g.wrap) { dr = Math.min(dr, g.rows - dr); dc = Math.min(dc, g.cols - dc); }
+      return dr * dr + dc * dc;
+    }
+    var mines = [], safes = [];
+    for (var i = 0; i < g.n; i++) if ((g.st[i] === 0 || g.st[i] === 3)) (g.mine[i] ? mines : safes).push(i);
+    if (!mines.length) { say("Все мины уже отмечены флажками."); return; }
+    mines.sort(function (a, b) { return dist(ref, a) - dist(ref, b); });
+    var m = mines[0];
+    if (!safes.length) { say("Безопасных закрытых клеток не осталось."); return; }
+    var near = nb(m).filter(function (x) { return safes.indexOf(x) >= 0; });
+    var pool = near.length ? near : safes;
+    pool.sort(function (a, b) { return dist(m, a) - dist(m, b); });
+    clearHint();
+    g.hint = { mine: m, safe: pool[0] };
+    paint(m); paint(pool[0]);
+    if (S.cheats.infHints) markCheat(); else g.hintsLeft--;
+    if (S.hintPenalty) { g.t = Math.min(999, g.t + S.hintPenalty); hud(); }
+    $("bulbBtn").textContent = hintsLabel();
+    say("Красная клетка: мина. Зелёная: безопасная.", 6000);
+    clearTimeout(hintTimer); hintTimer = setTimeout(clearHint, 6000);
+  }
+
+  /* ---------- timer, hud ---------- */
+  function startTimer() {
+    stopTimer();
+    timer = setInterval(function () {
+      if (g.status !== "playing" || g.paused) return;
+      if (S.cheats.freeze) { markCheat(); return; }
+      if (g.t < 999) { g.t++; $("timeLed").textContent = pad(g.t, 3); }
+      if (cur.o.limit && g.t >= cur.o.limit) lose(-1, "time");
+    }, 1000);
+  }
+  function stopTimer() { if (timer) { clearInterval(timer); timer = null; } }
+  function hud() {
+    var left = g.mines - g.flags;
+    $("minesLed").textContent = left < 0 ? "-" + pad(left, 2) : pad(left, 3);
+    $("minesLed").setAttribute("aria-label", "Осталось мин: " + left);
+    $("timeLed").textContent = pad(g.t, 3);
+    $("bulbBtn").textContent = hintsLabel();
+  }
+  function face(pressing) {
+    $("face").textContent = g.status === "won" ? "😎" : g.status === "lost" ? "😵" : pressing ? "😮" : "🙂";
+  }
+  function setPaused(p) {
+    if (!g || g.status !== "playing") return;
+    g.paused = p; $("pause").hidden = !p; $("pauseBtn").textContent = p ? "Продолжить" : "Пауза";
+  }
+
+  /* ---------- rendering ---------- */
+  function paint(i) {
+    var el = els[i]; if (!el) return;
+    var s = g.st[i], cls = "c", html = "", lost = g.status === "lost";
+    if (s === 1) {
+      if (g.mine[i]) { cls += " o" + (i === g.boom ? " boom" : ""); html = MINE; }
+      else if (g.adj[i] > 0) { cls += " o n" + g.adj[i]; html = g.adj[i]; }
+      else cls += " o";
+    } else if (lost && g.mine[i] && s !== 2) { cls += " o"; html = MINE; }
+    else if (s === 2) { cls += " h" + (lost && !g.mine[i] ? " wrong" : ""); html = FLAG; }
+    else if (s === 3) { cls += " h"; html = "?"; }
+    else cls += " h";
+    if (cls.indexOf(" h") >= 0 && !over()) {
+      if (g.hint && i === g.hint.mine) cls += " hm";
+      else if (g.hint && i === g.hint.safe) cls += " hs";
+      else if (S.cheats.xray && g.placed && g.mine[i]) cls += " xr";
+    }
+    el.className = cls; el.innerHTML = html;
+  }
+  function paintAll() { for (var i = 0; i < g.n; i++) paint(i); }
+  function build() {
+    var board = $("board"), avail = Math.min(document.documentElement.clientWidth - 32 - 18, 760);
+    var lim = { small: [22, 32], auto: [26, 40], large: [34, 52] }[S.cellSize] || [26, 40];
+    var size = Math.max(lim[0], Math.min(lim[1], Math.floor(avail / g.cols)));
+    board.style.setProperty("--s", size + "px");
+    board.style.gridTemplateColumns = "repeat(" + g.cols + ", " + size + "px)";
+    board.innerHTML = ""; els = [];
+    var frag = document.createDocumentFragment();
+    for (var i = 0; i < g.n; i++) { var d = document.createElement("div"); d.dataset.i = i; d.className = "c h"; els.push(d); frag.appendChild(d); }
+    board.appendChild(frag);
+  }
+  function preopen(o) {
+    placeMines((Math.random() * g.n) | 0);
+    var safe = [], total = g.n - g.mines;
+    for (var i = 0; i < g.n; i++) if (!g.mine[i]) safe.push(i);
+    shuffle(safe);
+    if (o.leftSafe) {
+      var openN = total - o.leftSafe;
+      for (var k = 0; k < openN; k++) { g.st[safe[k]] = 1; g.opened++; }
+    } else {
+      var target = Math.floor(total * o.preopen);
+      for (var q = 0; q < safe.length && g.opened < target; q++) {
+        var c = safe[q]; if (g.st[c] === 1) continue;
+        if (g.adj[c] === 0) flood(c); else { g.st[c] = 1; g.opened++; }
+      }
+    }
+    paintAll();
+  }
+
+  function describe(s) {
+    if (s.kind === "story") return "Сюжет, задание " + (s.idx + 1) + ": " + STORY[s.idx].n + " (" + s.cfg.rows + "×" + s.cfg.cols + ", " + s.cfg.mines + " мин)";
+    if (s.kind === "scn") return "Сценарий «" + s.name + "» (" + s.cfg.rows + "×" + s.cfg.cols + ", " + s.cfg.mines + " мин" + (s.o.limit ? ", лимит " + s.o.limit + " с" : "") + ")";
+    if (s.kind === "camp") return "Кампания: " + MODES[s.idx].name + " (" + s.cfg.rows + "×" + s.cfg.cols + ", " + s.cfg.mines + " мин)";
+    return (s.diff === "custom" ? "Особое поле" : LV[s.diff].name) + " (" + s.cfg.rows + "×" + s.cfg.cols + ", " + s.cfg.mines + " мин" + (s.cfg.wrap ? ", тор" : "") + ")";
+  }
+  function startGame(session, layout) {
+    stopTimer(); hideModal(); clearTimeout(hintTimer);
+    cur = session; cur.o = cur.o || {};
+    var cfg = cur.cfg, n = cfg.rows * cfg.cols;
+    g = { rows: cfg.rows, cols: cfg.cols, n: n, mines: cfg.mines, wrap: !!(cfg.wrap || cur.o.wrap), mine: new Uint8Array(n), adj: new Uint8Array(n), st: new Uint8Array(n),
+      placed: false, status: "idle", t: 0, flags: 0, opened: 0, paused: false, boom: -1, last: null, hint: null, hintsLeft: S.hints, cheated: false, snap: null, reason: "" };
+    mode = S.startMode; syncMode();
+    $("pause").hidden = true; $("pauseBtn").textContent = "Пауза";
+    build();
+    if (layout) { g.mine = Uint8Array.from(layout); computeAdj(); g.cheated = true; }
+    else if (cur.o.preopen || cur.o.leftSafe) preopen(cur.o);
+    say("");
+    $("modeLabel").textContent = describe(cur);
+    $("sub").textContent = cur.kind === "camp" ? "Кампания · " + (cur.idx + 1) + "/" + MODES.length : cur.kind === "story" ? "Сюжет" : cur.kind === "scn" ? "Сценарий" : "";
+    hud(); face(); syncQuick(); paintAll();
+  }
+  function restart(sameLayout) {
+    if (sameLayout && lastLayout && lastLayout.length === cur.cfg.rows * cur.cfg.cols) startGame(cur, lastLayout);
+    else startGame(cur);
+  }
+  function fieldSession() {
+    var m = S.fieldMode;
+    if (m !== "custom" && !LV[m]) { m = S.fieldMode = "beginner"; saveS(); }
+    if (m === "custom") return { kind: "level", diff: "custom", cfg: { rows: S.custom.rows, cols: S.custom.cols, mines: S.custom.mines, wrap: S.wrap }, o: {} };
+    return { kind: "level", diff: m, cfg: { rows: LV[m].rows, cols: LV[m].cols, mines: LV[m].mines }, o: {} };
+  }
+  function startCamp(idx) {
+    var m = MODES[idx];
+    showView("game");
+    startGame({ kind: "camp", idx: idx, cfg: { rows: m.rows, cols: m.cols, mines: m.mines }, o: {} });
+  }
+  function campNext() { var cp = loadCamp(); for (var i = 0; i < MODES.length; i++) if (!cp.beaten[MODES[i].id]) return i; return 0; }
+  function startStory(idx) {
+    var L = STORY[idx];
+    showView("game");
+    startGame({ kind: "story", idx: idx, cfg: { rows: L.r, cols: L.c, mines: L.m }, o: {} });
+    modal("📜", "Задание " + (idx + 1) + ": " + L.n, L.t + " Поле " + L.r + "×" + L.c + ", мин: " + L.m + ".", [["Начать", true, null]]);
+  }
+  function startScn(id) {
+    var s = SCN.filter(function (x) { return x.id === id; })[0];
+    showView("game");
+    startGame({ kind: "scn", name: s.n, cfg: { rows: s.r, cols: s.c, mines: s.m }, o: s.o });
+    modal("🎯", s.n, s.d, [["Начать", true, null]]);
+  }
+
+  /* ---------- modal ---------- */
+  function modal(icon, title, text, btns) {
+    $("mIcon").textContent = icon; $("mTitle").textContent = title; $("mText").textContent = text;
+    var box = $("mBtns"); box.innerHTML = "";
+    btns.forEach(function (b) {
+      var el = document.createElement("button"); el.type = "button"; el.className = b[1] ? "primary" : "sec"; el.textContent = b[0];
+      el.addEventListener("click", function () { hideModal(); if (b[2]) b[2](); });
+      box.appendChild(el);
+    });
+    $("scrim").hidden = false;
+    var first = box.querySelector("button"); if (first) first.focus();
+  }
+  function hideModal() { $("scrim").hidden = true; }
+
+  /* ---------- input ---------- */
+  var press = null, board = $("board");
+  board.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+  board.addEventListener("pointerdown", function (e) {
+    var t = e.target.closest(".c"); if (!t || (e.pointerType === "mouse" && e.button === 2)) return;
+    var i = +t.dataset.i;
+    press = { i: i, x: e.clientX, y: e.clientY, long: false };
+    if (S.longPress) press.tm = setTimeout(function () {
+      if (!press) return; press.long = true;
+      if (g.st[i] === 1) return;
+      mode === "open" ? toggleFlag(i) : reveal(i);
+      if (navigator.vibrate) { try { navigator.vibrate(15); } catch (er) {} }
+    }, S.longMs);
+    if (!over()) face(true);
+  });
+  board.addEventListener("pointermove", function (e) {
+    if (press && (Math.abs(e.clientX - press.x) > 10 || Math.abs(e.clientY - press.y) > 10)) cancelPress();
+  });
+  function cancelPress() { if (press) { clearTimeout(press.tm); press = null; face(); } }
+  board.addEventListener("pointercancel", cancelPress);
+  board.addEventListener("pointerleave", cancelPress);
+  board.addEventListener("pointerup", function () {
+    if (!press) return;
+    clearTimeout(press.tm);
+    var p = press; press = null;
+    if (!p.long) {
+      if (g.st[p.i] === 1) chord(p.i);
+      else mode === "open" ? reveal(p.i) : toggleFlag(p.i);
+    }
+    face();
+  });
+
+  /* ---------- controls ---------- */
+  function syncMode() {
+    document.querySelectorAll("#modeSeg button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.m === mode)); });
+  }
+  document.querySelectorAll("#modeSeg button").forEach(function (b) { b.addEventListener("click", function () { mode = b.dataset.m; syncMode(); }); });
+  $("pauseBtn").addEventListener("click", function () { setPaused(!g.paused); });
+  $("resumeBtn").addEventListener("click", function () { setPaused(false); });
+  $("bulbBtn").addEventListener("click", useHint);
+  document.addEventListener("visibilitychange", function () { if (document.hidden) setPaused(true); });
+  $("face").addEventListener("click", function () {
+    if (g.status === "playing" && g.opened > 0) {
+      modal("🙂", "Начать заново?", "Текущая партия будет потеряна.", [["Нет", false, null], ["Да", true, function () { restart(false); }]]);
+    } else if (g.status === "lost" && S.cheats.replay && lastLayout) restart(true);
+    else restart(false);
+  });
+  function syncQuick() { renderMenu(); }
+
+  /* ---------- menu ---------- */
+  function curMode() {
+    if (S.fieldMode === "custom") return { id: "custom", name: "Особое поле", rows: S.custom.rows, cols: S.custom.cols, mines: S.custom.mines };
+    return LV[S.fieldMode] || LV.beginner;
+  }
+  function renderMenu() {
+    var m = curMode(), cp = loadCamp(), stats = loadStats(), cells = "";
+    for (var r = 0; r < m.rows; r++) for (var c = 0; c < m.cols; c++) cells += "<i" + (((r * 7 + c * 13 + r * c) % 9) < 2 ? ' class="po"' : "") + "></i>";
+    var pv = $("sqPv");
+    pv.style.cssText = "grid-template-columns:repeat(" + m.cols + ",1fr);aspect-ratio:" + m.cols + "/" + m.rows + ";" + (m.rows > m.cols ? "height:100%;" : "width:100%;");
+    pv.innerHTML = cells;
+    var st = stats[m.id], best = st && st.times && st.times.length ? " · лучшее " + st.times[0] + " с" : "";
+    $("sqName").textContent = m.name + " " + m.rows + "×" + m.cols;
+    $("sqInfo").textContent = m.mines + " мин" + best + (S.fieldMode === "custom" && S.wrap ? " · края соединены" : "");
+    $("contBtn").hidden = !(g && g.status === "playing");
+    var n = 0; MODES.forEach(function (x) { if (cp.beaten[x.id]) n++; });
+    var nx = MODES[campNext()];
+    $("campInfo").textContent = n >= MODES.length ? "Пройдена · начать заново" : (n ? "Продолжить: " : "Начать: ") + nx.name + " " + nx.rows + "×" + nx.cols + " · пройдено " + n + " из " + MODES.length;
+  }
+  function playNow() { showView("game"); startGame(fieldSession()); }
+  $("sq").addEventListener("click", function () {
+    if (g && g.status === "playing" && g.opened > 0) modal("🙂", "Начать новую партию?", "Текущая партия будет потеряна.", [["Нет", false, null], ["Да", true, playNow]]);
+    else playNow();
+  });
+  $("contBtn").addEventListener("click", function () { showView("game"); });
+  $("campTile").addEventListener("click", function () { startCamp(campNext()); });
+  $("setTile").addEventListener("click", function () { showView("set"); });
+  document.querySelectorAll("[data-go]").forEach(function (b) { b.addEventListener("click", function () { showView(b.dataset.go); }); });
+  document.querySelectorAll("[data-back]").forEach(function (b) { b.addEventListener("click", function () { showView("menu"); }); });
+
+  /* ---------- views ---------- */
+  function showView(v) {
+    if (v !== "game") setPaused(true);
+    ["menu", "game", "story", "scn", "stats", "set"].forEach(function (k) { $("v-" + k).hidden = k !== v; });
+    if (v === "menu") renderMenu();
+    if (v === "story") renderStory();
+    if (v === "scn") renderScn();
+    if (v === "stats") renderStats();
+    window.scrollTo(0, 0);
+  }
+
+  function renderStory() {
+    var st = loadStory(), html = "";
+    STORY.forEach(function (L, i) {
+      var locked = i > st.done, next = i === st.done, done = i < st.done;
+      html += '<div class="card' + (locked ? " locked" : "") + (next ? " next" : "") + '"><h3>' + (i + 1) + ". " + L.n + "</h3>" +
+        "<p>" + (locked ? "Откроется после победы в задании " + i + "." : L.t) + "</p>" +
+        '<div class="meta"><span><span class="tag">' + L.r + "×" + L.c + '</span> <span class="tag">' + L.m + " мин</span>" + (done && st.best[i] != null ? ' <span class="tag">лучшее ' + st.best[i] + " с</span>" : "") + "</span>" +
+        (locked ? "<span>закрыто</span>" : '<button class="' + (next ? "primary" : "ghost") + '" type="button" data-story="' + i + '">' + (done ? "Заново" : "Играть") + "</button>") + "</div></div>";
+    });
+    $("storyList").innerHTML = html;
+  }
+  $("storyList").addEventListener("click", function (e) { var b = e.target.closest("[data-story]"); if (b) startStory(+b.dataset.story); });
+  function renderScn() {
+    var html = "";
+    SCN.forEach(function (s) {
+      html += '<div class="card"><h3>' + s.n + "</h3><p>" + s.d + '</p><div class="meta"><span><span class="tag">' + s.r + "×" + s.c + '</span> <span class="tag">' + s.m + ' мин</span></span><button class="primary" type="button" data-scn="' + s.id + '">Играть</button></div></div>';
+    });
+    $("scnList").innerHTML = html;
+  }
+  $("scnList").addEventListener("click", function (e) { var b = e.target.closest("[data-scn]"); if (b) startScn(b.dataset.scn); });
+  function renderStats() {
+    var s = loadStats(), html = "", anyPlayed = false;
+    Object.keys(LV).forEach(function (k) {
+      var d = s[k], pct = d.played ? Math.round(d.won / d.played * 100) : 0;
+      if (!d.played) return;
+      anyPlayed = true;
+      html += '<div class="card"><div class="lvl"><h3>' + LV[k].name + "</h3>" +
+        "<span>Сыграно</span><span>" + d.played + "</span><span>Побед</span><span>" + d.won + "</span>" +
+        "<span>Процент побед</span><span>" + pct + "%</span><span>Серия побед</span><span>" + d.streak + "</span>" +
+        "<span>Лучшая серия</span><span>" + d.bestStreak + "</span>" +
+        '<div class="times">' + (d.times.length ? d.times.map(function (t) { return "<b>" + t + " с</b>"; }).join("") : "<span>Пока нет побед</span>") + "</div></div></div>";
+    });
+    if (!anyPlayed) html += '<p class="hint">Пока нет сыгранных партий.</p>';
+    var sy = loadStory();
+    html += '<div class="card"><div class="lvl"><h3>Сюжет</h3><span>Пройдено заданий</span><span>' + sy.done + " из " + STORY.length + "</span></div></div>";
+    $("statsBody").innerHTML = html;
+  }
+  $("resetStats").addEventListener("click", function () {
+    modal("🗑", "Сбросить статистику?", "Результаты уровней и прогресс сюжета будут удалены.", [["Отмена", false, null], ["Сбросить", true, function () {
+      try { localStorage.removeItem(KEY); localStorage.removeItem(SK); localStorage.removeItem(CK); } catch (e) {} renderStats();
+    }]]);
+  });
+
+  /* ---------- settings UI ---------- */
+  function applyTheme() {
+    var r = document.documentElement;
+    if (S.theme === "system") r.removeAttribute("data-theme"); else r.setAttribute("data-theme", S.theme);
+  }
+  function fieldInfo() {
+    var m = S.fieldMode, t = m === "custom"
+      ? S.custom.rows + "×" + S.custom.cols + ", " + S.custom.mines + " мин" + (S.wrap ? ", края соединены" : "")
+      : LV[m].rows + "×" + LV[m].cols + ", " + LV[m].mines + " мин";
+    $("fieldInfo").textContent = "Сейчас: " + t;
+  }
+  function syncSettingsUI() {
+    document.querySelectorAll("#v-set [data-k]").forEach(function (el) {
+      var k = el.dataset.k, v = getK(k);
+      if (el.classList.contains("seg")) el.querySelectorAll("button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.v === String(v))); });
+      else if (el.type === "checkbox") el.checked = !!v;
+      else el.value = String(v);
+    });
+    $("customBox").hidden = S.fieldMode !== "custom";
+    $("cRows").value = S.custom.rows; $("cCols").value = S.custom.cols; $("cMines").value = S.custom.mines;
+    $("longVal").textContent = S.longMs + " мс";
+    fieldInfo(); syncQuick();
+  }
+  document.querySelectorAll("#v-set [data-k]").forEach(function (el) {
+    var k = el.dataset.k;
+    if (el.classList.contains("seg")) {
+      el.querySelectorAll("button").forEach(function (b) {
+        b.addEventListener("click", function () {
+          setK(k, b.dataset.v);
+          if (k === "theme") applyTheme();
+          if (k === "startMode") { mode = S.startMode; syncMode(); }
+          syncSettingsUI();
+          if (k === "fieldMode" && b.dataset.v !== "custom") startGame(fieldSession());
+        });
+      });
+    } else if (el.type === "checkbox") {
+      el.addEventListener("change", function () {
+        setK(k, el.checked);
+        if (k === "cheats.xray" && g) paintAll();
+        if (k === "cheats.infHints" && g) $("bulbBtn").textContent = hintsLabel();
+        if (k === "wrap") { syncSettingsUI(); }
+      });
+    } else {
+      el.addEventListener("input", function () {
+        setK(k, el.dataset.num || el.type === "range" ? Number(el.value) : el.value);
+        if (k === "longMs") $("longVal").textContent = S.longMs + " мс";
+        if (k === "fieldMode") syncSettingsUI();
+      });
+    }
+  });
+  function validCustom(r, c, m) {
+    var max = Math.floor(r * c * 0.35);
+    return r >= 2 && r <= 30 && c >= 2 && c <= 50 && m >= 1 && m <= max;
+  }
+  $("cApply").addEventListener("click", function () {
+    var r = parseInt($("cRows").value, 10), c = parseInt($("cCols").value, 10), m = parseInt($("cMines").value, 10), err = $("cErr");
+    if (!validCustom(r, c, m)) {
+      var max = (r > 0 && c > 0) ? Math.floor(r * c * 0.35) : "35% клеток";
+      err.hidden = false; err.textContent = "Поле от 2×2 до 30×50, мин от 1 до " + max + " (не более 35% клеток).";
+      return;
+    }
+    err.hidden = true;
+    S.custom = { rows: r, cols: c, mines: m }; S.fieldMode = "custom"; saveS();
+    syncSettingsUI(); showView("game"); startGame(fieldSession());
+  });
+  $("cRandom").addEventListener("click", function () {
+    var r = 5 + ((Math.random() * 16) | 0), c = 5 + ((Math.random() * 26) | 0);
+    var m = Math.max(1, Math.round(r * c * (0.12 + Math.random() * 0.2)));
+    $("cRows").value = r; $("cCols").value = c; $("cMines").value = Math.min(m, Math.floor(r * c * 0.35)); $("cErr").hidden = true;
+  });
+  $("resetSettings").addEventListener("click", function () {
+    modal("⚙", "Сбросить настройки?", "Все параметры вернутся к значениям по умолчанию.", [["Отмена", false, null], ["Сбросить", true, function () {
+      S = defaults(); saveS(); applyTheme(); mode = S.startMode; syncMode(); syncSettingsUI(); startGame(fieldSession());
+    }]]);
+  });
+
+  $("fieldSel").innerHTML = MODES.map(function (m) { return '<option value="' + m.id + '">' + m.name + " " + m.rows + "×" + m.cols + ", " + m.mines + " мин</option>"; }).join("") + '<option value="custom">Особый (свои размеры)</option>';
+  applyTheme(); syncSettingsUI(); startGame(fieldSession()); showView("menu");
+})();
+</script>
+
+</body>
+</html>
